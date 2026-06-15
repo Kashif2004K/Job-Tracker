@@ -1,0 +1,283 @@
+/* =========================
+   GLOBAL
+========================= */
+body {
+  background: #f6f7fb;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* =========================
+   APP WRAPPER
+========================= */
+.container {
+  max-width: 900px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 0 15px;
+}
+
+/* =========================
+   PAGE TITLE (NOT GLOBAL h2)
+========================= */
+.pageTitle {
+  margin-bottom: 20px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* =========================
+   STATS
+========================= */
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.statCard {
+  background: white;
+  padding: 15px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+}
+
+.statCard h3 {
+  font-size: 22px;
+  margin: 0;
+  color: #111;
+}
+
+.statCard p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: #777;
+}
+
+/* =========================
+   FORM
+========================= */
+.form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.input:focus {
+  border-color: #000;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.button {
+  padding: 12px 16px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.button:hover {
+  background: #222;
+}
+
+/* =========================
+   JOB CARD
+========================= */
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 12px;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.card h3 {
+  margin: 0;
+}
+
+.card p {
+  margin: 3px 0;
+  color: #666;
+}
+
+/* =========================
+   STATUS BADGES
+========================= */
+.status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.status.applied {
+  background: #e8f0ff;
+  color: #1d4ed8;
+}
+
+.status.interview {
+  background: #fff7e6;
+  color: #d97706;
+}
+
+.status.rejected {
+  background: #ffe6e6;
+  color: #dc2626;
+}
+
+.status.accepted {
+  background: #e7f8ee;
+  color: #16a34a;
+}
+
+/* =========================
+   SELECT
+========================= */
+select {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  margin-left: 10px;
+  background: white;
+}
+
+/* =========================
+   DELETE BUTTON
+========================= */
+.deleteBtn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #dc2626;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+  width: 100%;
+  height: 60px;
+  background: black;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.navLinks {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.navLinks a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.navLinks button {
+  background: #ef4444;
+  border: none;
+  padding: 6px 10px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+body.dark {
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+/* container */
+body.dark .container {
+  background: transparent;
+}
+
+/* cards */
+body.dark .card,
+body.dark .statCard {
+  background: #1e293b;
+  color: #e5e7eb;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* inputs */
+body.dark .input,
+body.dark select {
+  background: #0f172a;
+  color: white;
+  border: 1px solid #334155;
+}
+
+/* buttons */
+body.dark .button {
+  background: #2563eb;
+}
+
+body.dark .deleteBtn {
+  background: #dc2626;
+}
+
+/* navbar stays dark (already black, but refine) */
+body.dark .navbar {
+  background: #020617;
+}

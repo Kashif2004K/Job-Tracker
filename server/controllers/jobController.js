@@ -9,7 +9,7 @@ export const createJob = async (req, res) => {
       title,
       company,
       status,
-      user: req.user._id, // comes from JWT middleware
+      user: req.user._id,
     });
 
     res.status(201).json(job);
@@ -18,7 +18,7 @@ export const createJob = async (req, res) => {
   }
 };
 
-// GET ALL JOBS (ONLY LOGGED IN USER)
+// GET ALL JOBS
 export const getJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ user: req.user._id });
@@ -29,74 +29,64 @@ export const getJobs = async (req, res) => {
   }
 };
 
-// UPDATE JOB STATUS
+// UPDATE JOB
 export const updateJob = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const job = await Job.findById(id);
+    const job = await Job.findById(req.params.id);
 
     if (!job) {
-      return res.status(404).json({ message: "Job not found" });
+      return res.status(404).json({
+        message: "Job not found",
+      });
     }
 
-    // update fields
-    job.title = req.body.title || job.title;
-    job.company = req.body.company || job.company;
-    job.status = req.body.status || job.status;
+    // Check ownership
+    if (job.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Not authorized",
+      });
+    }
+
+    job.title = req.body.title ?? job.title;
+    job.company = req.body.company ?? job.company;
+    job.status = req.body.status ?? job.status;
 
     const updatedJob = await job.save();
 
     res.status(200).json(updatedJob);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
-
-//DELETE JOB
+// DELETE JOB
 export const deleteJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
 
     if (!job) {
-      return res.status(404).json({ message: "Job not found" });
+      return res.status(404).json({
+        message: "Job not found",
+      });
     }
 
-    // IMPORTANT: ensure user owns the job
+    // Check ownership
     if (job.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized" });
+      return res.status(403).json({
+        message: "Not authorized",
+      });
     }
 
     await job.deleteOne();
 
-    res.json({ message: "Job deleted successfully" });
+    res.status(200).json({
+      message: "Job deleted successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// UPDATE JOB STATUS (SEPARATE ENDPOINT)
-export const updateJobStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-
-    const job = await Job.findById(req.params.id);
-
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-
-    // ownership check (important SaaS security)
-    if (job.user.toString() !== req.user.id) {
-      return res.status(403).json({ message: "Not authorized" });
-    }
-
-    job.status = status;
-    await job.save();
-
-    res.json(job);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };

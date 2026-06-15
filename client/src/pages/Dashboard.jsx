@@ -1,18 +1,48 @@
 import { useEffect, useState } from "react";
+import "./Dashboard.css";
 import API from "../api/api";
+import Navbar from "../components/Navbar";
 
 function Dashboard() {
   const [jobs, setJobs] = useState([]);
-
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
 
+  const [stats, setStats] = useState({
+    total: 0,
+    applied: 0,
+    interview: 0,
+    rejected: 0,
+    accepted: 0,
+  });
+
+  // -------------------------
+  // STATS CALCULATION
+  // -------------------------
+  const calculateStats = (jobs) => {
+    const newStats = {
+      total: jobs.length,
+      applied: 0,
+      interview: 0,
+      rejected: 0,
+      accepted: 0,
+    };
+
+    jobs.forEach((job) => {
+      if (newStats[job.status] !== undefined) {
+        newStats[job.status]++;
+      }
+    });
+
+    setStats(newStats);
+  };
+
+  // -------------------------
   // FETCH JOBS
+  // -------------------------
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      console.log("TOKEN:", token);
 
       const res = await API.get("/jobs", {
         headers: {
@@ -21,6 +51,7 @@ function Dashboard() {
       });
 
       setJobs(res.data);
+      calculateStats(res.data);
     } catch (error) {
       console.log(error.response?.data?.message);
     }
@@ -30,7 +61,9 @@ function Dashboard() {
     fetchJobs();
   }, []);
 
-  // CREATE JOB
+  // -------------------------
+  // ADD JOB
+  // -------------------------
   const addJob = async (e) => {
     e.preventDefault();
 
@@ -49,14 +82,15 @@ function Dashboard() {
 
       setTitle("");
       setCompany("");
-
       fetchJobs();
     } catch (error) {
       console.log(error.response?.data?.message);
     }
   };
 
+  // -------------------------
   // DELETE JOB
+  // -------------------------
   const deleteJob = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -73,7 +107,9 @@ function Dashboard() {
     }
   };
 
+  // -------------------------
   // UPDATE STATUS
+  // -------------------------
   const updateStatus = async (id, status) => {
     try {
       const token = localStorage.getItem("token");
@@ -94,118 +130,102 @@ function Dashboard() {
     }
   };
 
+  // -------------------------
+  // UI
+  // -------------------------
   return (
-    <div style={styles.container}>
-      <h2>My Jobs Dashboard</h2>
+    <>
+      <Navbar />
 
-      {/* ADD JOB FORM */}
-      <form onSubmit={addJob} style={styles.form}>
-        <input
-          type="text"
-          placeholder="Job Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={styles.input}
-        />
+      <div className="container">
+        <h2>My Jobs Dashboard</h2>
 
-        <input
-          type="text"
-          placeholder="Company"
-          value={company}
-          onChange={(e) => setCompany(e.target.value)}
-          style={styles.input}
-        />
+        {/* STATS */}
+        <div className="statsContainer">
+          <div className="statCard">
+            <h3>{stats.total}</h3>
+            <p>Total Jobs</p>
+          </div>
 
-        <button type="submit" style={styles.button}>
-          Add Job
-        </button>
-      </form>
+          <div className="statCard">
+            <h3>{stats.applied}</h3>
+            <p>Applied</p>
+          </div>
 
-      {/* JOB LIST */}
-      {jobs.map((job) => (
-        <div key={job._id} style={styles.card}>
-          <h3>{job.title}</h3>
-          <p>{job.company}</p>
+          <div className="statCard">
+            <h3>{stats.interview}</h3>
+            <p>Interview</p>
+          </div>
 
-          {/* STATUS DROPDOWN */}
-          <select
-            value={job.status}
-            onChange={(e) => updateStatus(job._id, e.target.value)}
-          >
-            <option value="applied">Applied</option>
-            <option value="interview">Interview</option>
-            <option value="rejected">Rejected</option>
-            <option value="accepted">Accepted</option>
-          </select>
+          <div className="statCard">
+            <h3>{stats.rejected}</h3>
+            <p>Rejected</p>
+          </div>
 
-          <button
-            onClick={() => deleteJob(job._id)}
-            style={styles.deleteBtn}
-          >
-            Delete
-          </button>
+          <div className="statCard">
+            <h3>{stats.accepted}</h3>
+            <p>Accepted</p>
+          </div>
         </div>
-      ))}
-    </div>
+
+        {/* ADD JOB FORM */}
+        <form onSubmit={addJob} className="form">
+          <input
+            type="text"
+            placeholder="Job Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="input"
+          />
+
+          <input
+            type="text"
+            placeholder="Company"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            className="input"
+          />
+
+          <button type="submit" className="button">
+            Add Job
+          </button>
+        </form>
+
+        {/* JOB LIST */}
+        {jobs.map((job) => (
+          <div className="card">
+  <div>
+    <h3>{job.title}</h3>
+    <p>{job.company}</p>
+  </div>
+
+  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <span className={`status ${job.status}`}>
+      {job.status}
+    </span>
+
+    <select
+      value={job.status}
+      onChange={(e) => updateStatus(job._id, e.target.value)}
+    >
+      <option value="applied">Applied</option>
+      <option value="interview">Interview</option>
+      <option value="rejected">Rejected</option>
+      <option value="accepted">Accepted</option>
+    </select>
+
+    <button
+      onClick={() => deleteJob(job._id)}
+      className="deleteBtn"
+    >
+      Delete
+    </button>
+  </div>
+</div>
+        ))}
+      </div>
+    </>
   );
 }
-
-const styles = {
-  container: {
-  maxWidth: "600px",
-  margin: "60px auto",
-  fontFamily: "Arial",
-  padding: "20px",
-},
- form: {
-  display: "flex",
-  gap: "10px",
-  marginBottom: "25px",
-  padding: "15px",
-  border: "1px solid #eee",
-  borderRadius: "10px",
-  backgroundColor: "#fafafa",
-},
- input: {
-  padding: "10px",
-  flex: 1,
-  border: "1px solid #ddd",
-  borderRadius: "6px",
-  outline: "none",
-},
- button: {
-  padding: "10px 14px",
-  backgroundColor: "#111",
-  color: "white",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-},
- deleteBtn: {
-  marginTop: "10px",
-  padding: "6px 10px",
-  backgroundColor: "#ff4d4f",
-  color: "white",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-},
-  card: {
-  border: "1px solid #eee",
-  padding: "15px",
-  marginTop: "12px",
-  borderRadius: "10px",
-  backgroundColor: "#fff",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-},
-status: {
-  display: "inline-block",
-  padding: "4px 8px",
-  borderRadius: "6px",
-  fontSize: "12px",
-  marginTop: "5px",
-  backgroundColor: "#eee",
-}
-};
 
 export default Dashboard;
