@@ -4,7 +4,6 @@ import API from "../api/api";
 function Dashboard() {
   const [jobs, setJobs] = useState([]);
 
-  // form states
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
 
@@ -12,6 +11,7 @@ function Dashboard() {
   const fetchJobs = async () => {
     try {
       const token = localStorage.getItem("token");
+
       console.log("TOKEN:", token);
 
       const res = await API.get("/jobs", {
@@ -39,10 +39,7 @@ function Dashboard() {
 
       await API.post(
         "/jobs",
-        {
-          title,
-          company,
-        },
+        { title, company },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +50,45 @@ function Dashboard() {
       setTitle("");
       setCompany("");
 
-      fetchJobs(); // refresh list
+      fetchJobs();
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    }
+  };
+
+  // DELETE JOB
+  const deleteJob = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.delete(`/jobs/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchJobs();
+    } catch (error) {
+      console.log(error.response?.data?.message);
+    }
+  };
+
+  // UPDATE STATUS
+  const updateStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.put(
+        `/jobs/${id}`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      fetchJobs();
     } catch (error) {
       console.log(error.response?.data?.message);
     }
@@ -87,48 +122,90 @@ function Dashboard() {
       </form>
 
       {/* JOB LIST */}
-      {jobs.length === 0 ? (
-        <p>No jobs found</p>
-      ) : (
-        jobs.map((job) => (
-          <div key={job._id} style={styles.card}>
-            <h3>{job.title}</h3>
-            <p>{job.company}</p>
-            <p>Status: {job.status}</p>
-          </div>
-        ))
-      )}
+      {jobs.map((job) => (
+        <div key={job._id} style={styles.card}>
+          <h3>{job.title}</h3>
+          <p>{job.company}</p>
+
+          {/* STATUS DROPDOWN */}
+          <select
+            value={job.status}
+            onChange={(e) => updateStatus(job._id, e.target.value)}
+          >
+            <option value="applied">Applied</option>
+            <option value="interview">Interview</option>
+            <option value="rejected">Rejected</option>
+            <option value="accepted">Accepted</option>
+          </select>
+
+          <button
+            onClick={() => deleteJob(job._id)}
+            style={styles.deleteBtn}
+          >
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
 
 const styles = {
   container: {
-    width: "500px",
-    margin: "50px auto",
-    fontFamily: "Arial",
-  },
-  form: {
-    display: "flex",
-    gap: "10px",
-    marginBottom: "20px",
-  },
-  input: {
-    padding: "8px",
-    flex: 1,
-  },
-  button: {
-    padding: "8px",
-    backgroundColor: "black",
-    color: "white",
-    border: "none",
-    cursor: "pointer",
-  },
+  maxWidth: "600px",
+  margin: "60px auto",
+  fontFamily: "Arial",
+  padding: "20px",
+},
+ form: {
+  display: "flex",
+  gap: "10px",
+  marginBottom: "25px",
+  padding: "15px",
+  border: "1px solid #eee",
+  borderRadius: "10px",
+  backgroundColor: "#fafafa",
+},
+ input: {
+  padding: "10px",
+  flex: 1,
+  border: "1px solid #ddd",
+  borderRadius: "6px",
+  outline: "none",
+},
+ button: {
+  padding: "10px 14px",
+  backgroundColor: "#111",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  cursor: "pointer",
+},
+ deleteBtn: {
+  marginTop: "10px",
+  padding: "6px 10px",
+  backgroundColor: "#ff4d4f",
+  color: "white",
+  border: "none",
+  borderRadius: "6px",
+  cursor: "pointer",
+},
   card: {
-    border: "1px solid #ccc",
-    padding: "10px",
-    marginTop: "10px",
-  },
+  border: "1px solid #eee",
+  padding: "15px",
+  marginTop: "12px",
+  borderRadius: "10px",
+  backgroundColor: "#fff",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+},
+status: {
+  display: "inline-block",
+  padding: "4px 8px",
+  borderRadius: "6px",
+  fontSize: "12px",
+  marginTop: "5px",
+  backgroundColor: "#eee",
+}
 };
 
 export default Dashboard;

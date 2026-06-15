@@ -1,5 +1,5 @@
 import express from "express";
-import { createJob, getJobs, updateJob, deleteJob  } from "../controllers/jobController.js";
+import { createJob, getJobs, updateJob, deleteJob, updateJobStatus  } from "../controllers/jobController.js";
 import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -8,5 +8,6 @@ router.post("/", protect, createJob);
 router.get("/", protect, getJobs);
 router.put("/:id", protect, updateJob);
 router.delete("/:id", protect, deleteJob);
+router.patch("/:id", protect, updateJobStatus);
 
 export default router;

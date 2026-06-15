@@ -57,17 +57,45 @@ export const updateJob = async (req, res) => {
 //DELETE JOB
 export const deleteJob = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const job = await Job.findById(id);
+    const job = await Job.findById(req.params.id);
 
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    // IMPORTANT: ensure user owns the job
+    if (job.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
     await job.deleteOne();
 
-    res.status(200).json({ message: "Job deleted successfully" });
+    res.json({ message: "Job deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// UPDATE JOB STATUS (SEPARATE ENDPOINT)
+export const updateJobStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    // ownership check (important SaaS security)
+    if (job.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    job.status = status;
+    await job.save();
+
+    res.json(job);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
