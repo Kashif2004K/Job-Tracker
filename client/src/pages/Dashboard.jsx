@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
 import API from "../api/api";
-import Navbar from "../components/Navbar";
 
 function Dashboard() {
   const [jobs, setJobs] = useState([]);
@@ -135,7 +134,7 @@ function Dashboard() {
   // -------------------------
   return (
     <>
-      <Navbar />
+      
 
       <div className="container">
         <h2>My Jobs Dashboard</h2>
