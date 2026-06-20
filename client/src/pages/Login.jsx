@@ -24,7 +24,11 @@ function Login() {
       // go to dashboard
       navigate("/dashboard");
     } catch (error) {
-      alert(error.response?.data?.message || "Login failed");
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Login failed";
+      alert(message);
     }
   };
 

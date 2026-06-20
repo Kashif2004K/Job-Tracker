@@ -22,7 +22,11 @@ function Register() {
 
       navigate("/");
     } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Registration failed";
+      alert(message);
     }
   };
 
