@@ -17,7 +17,15 @@ app.use(async (req, res, next) => {
     next();
   } catch (error) {
     console.error("Database connection failed:", error.message);
-    res.status(500).json({ message: "Database connection failed" });
+
+    let hint = "Check MongoDB Atlas Network Access allows 0.0.0.0/0.";
+    if (!process.env.MONGO_URI) {
+      hint = "Add MONGO_URI in your Vercel server project Environment Variables.";
+    } else if (error.message.includes("authentication failed")) {
+      hint = "MongoDB username or password in MONGO_URI is incorrect.";
+    }
+
+    res.status(500).json({ message: "Database connection failed", hint });
   }
 });
 
