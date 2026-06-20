@@ -50,11 +50,6 @@ A modern React-based Job Tracking application that helps users manage and monito
 The app supports dark mode with persistent theme storage.  
 User preference is saved in `localStorage` and applied on reload.
 
----
-
-## 📸 Preview
-
-> (Add screenshots here once you deploy or run locally)
 
 ---
 
@@ -85,14 +80,4 @@ Frontend practice project for portfolio development.
 
 ---
 
-## ⭐ If you like this project
 
-Give it a star ⭐ and feel free to fork it!
-```
-
----
-
-If you want next level upgrade, I can also:
-- :contentReference[oaicite:0]{index=0}
-- :contentReference[oaicite:1]{index=1}
-- or :contentReference[oaicite:2]{index=2} 👀
