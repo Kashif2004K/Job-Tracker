@@ -5,8 +5,6 @@ import userRoutes from "./routes/userRoutes.js";
 import connectDB from "./config/db.js";
 import jobRoutes from "./routes/jobRoutes.js";
 
-
-
 // load env FIRST
 dotenv.config();
 
@@ -17,7 +15,11 @@ const app = express();
 
 // middleware
 app.use(cors({
-  origin: "http://localhost:5173",
+  // Allows your local dev environment AND your future deployed frontend to access the API
+  origin: [
+    "http://localhost:5173", 
+    /\.vercel\.app$/ // Matches any Vercel deployment preview/production URL
+  ],
   credentials: true
 }));
 
@@ -32,9 +34,14 @@ app.get("/", (req, res) => {
   res.send("API Running");
 });
 
-// start server
-const PORT = process.env.PORT || 5000;
+// --- REMOVED APP.LISTEN FOR VERCEL ---
+// Only run app.listen if running locally, otherwise export for Vercel
+if (process.env.NODE_ENV !== "production") {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
+// CRITICAL: Vercel needs you to export the app instance
+export default app;
