@@ -1,229 +1,155 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css";
-import API from "../api/api";
 
 function Dashboard() {
   const [jobs, setJobs] = useState([]);
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
 
-  const [stats, setStats] = useState({
-    total: 0,
-    applied: 0,
-    interview: 0,
-    rejected: 0,
-    accepted: 0,
-  });
-
   // -------------------------
-  // STATS CALCULATION
+  // LOAD FROM LOCALSTORAGE
   // -------------------------
-  const calculateStats = (jobs) => {
-    const newStats = {
-      total: jobs.length,
-      applied: 0,
-      interview: 0,
-      rejected: 0,
-      accepted: 0,
-    };
-
-    jobs.forEach((job) => {
-      if (newStats[job.status] !== undefined) {
-        newStats[job.status]++;
-      }
-    });
-
-    setStats(newStats);
-  };
-
-  // -------------------------
-  // FETCH JOBS
-  // -------------------------
-  const fetchJobs = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await API.get("/jobs", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      setJobs(res.data);
-      calculateStats(res.data);
-    } catch (error) {
-      console.log(error.response?.data?.message);
-    }
-  };
-
   useEffect(() => {
-    fetchJobs();
+    const storedJobs = JSON.parse(localStorage.getItem("jobs")) || [];
+    setJobs(storedJobs);
   }, []);
+
+  // -------------------------
+  // SAVE TO LOCALSTORAGE
+  // -------------------------
+  const saveJobs = (updatedJobs) => {
+    setJobs(updatedJobs);
+    localStorage.setItem("jobs", JSON.stringify(updatedJobs));
+  };
 
   // -------------------------
   // ADD JOB
   // -------------------------
-  const addJob = async (e) => {
+  const addJob = (e) => {
     e.preventDefault();
 
-    try {
-      const token = localStorage.getItem("token");
+    if (!title || !company) return;
 
-      await API.post(
-        "/jobs",
-        { title, company },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    const newJob = {
+      id: Date.now(),
+      title,
+      company,
+      status: "applied",
+    };
 
-      setTitle("");
-      setCompany("");
-      fetchJobs();
-    } catch (error) {
-      console.log(error.response?.data?.message);
-    }
+    const updatedJobs = [...jobs, newJob];
+
+    saveJobs(updatedJobs);
+
+    setTitle("");
+    setCompany("");
   };
 
   // -------------------------
   // DELETE JOB
   // -------------------------
-  const deleteJob = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      await API.delete(`/jobs/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      fetchJobs();
-    } catch (error) {
-      console.log(error.response?.data?.message);
-    }
+  const deleteJob = (id) => {
+    const updatedJobs = jobs.filter((job) => job.id !== id);
+    saveJobs(updatedJobs);
   };
 
   // -------------------------
   // UPDATE STATUS
   // -------------------------
-  const updateStatus = async (id, status) => {
-    try {
-      const token = localStorage.getItem("token");
+  const updateStatus = (id, status) => {
+    const updatedJobs = jobs.map((job) =>
+      job.id === id ? { ...job, status } : job
+    );
 
-      await API.put(
-        `/jobs/${id}`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      fetchJobs();
-    } catch (error) {
-      console.log(error.response?.data?.message);
-    }
+    saveJobs(updatedJobs);
   };
+
+  // -------------------------
+  // STATS (DERIVED)
+  // -------------------------
+  const stats = jobs.reduce(
+    (acc, job) => {
+      acc.total++;
+      acc[job.status]++;
+      return acc;
+    },
+    {
+      total: 0,
+      applied: 0,
+      interview: 0,
+      rejected: 0,
+      accepted: 0,
+    }
+  );
 
   // -------------------------
   // UI
   // -------------------------
   return (
-    <>
-      
+    <div className="container">
+      <h2>My Jobs Dashboard</h2>
 
-      <div className="container">
-        <h2>My Jobs Dashboard</h2>
+      {/* STATS */}
+      <div className="statsContainer">
+        <div className="statCard"><h3>{stats.total}</h3><p>Total</p></div>
+        <div className="statCard"><h3>{stats.applied}</h3><p>Applied</p></div>
+        <div className="statCard"><h3>{stats.interview}</h3><p>Interview</p></div>
+        <div className="statCard"><h3>{stats.rejected}</h3><p>Rejected</p></div>
+        <div className="statCard"><h3>{stats.accepted}</h3><p>Accepted</p></div>
+      </div>
 
-        {/* STATS */}
-        <div className="statsContainer">
-          <div className="statCard">
-            <h3>{stats.total}</h3>
-            <p>Total Jobs</p>
+      {/* FORM */}
+      <form onSubmit={addJob} className="form">
+        <input
+          type="text"
+          placeholder="Job Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="input"
+        />
+
+        <input
+          type="text"
+          placeholder="Company"
+          value={company}
+          onChange={(e) => setCompany(e.target.value)}
+          className="input"
+        />
+
+        <button className="button">Add Job</button>
+      </form>
+
+      {/* LIST */}
+      {jobs.map((job) => (
+        <div className="card" key={job.id}>
+          <div>
+            <h3>{job.title}</h3>
+            <p>{job.company}</p>
           </div>
 
-          <div className="statCard">
-            <h3>{stats.applied}</h3>
-            <p>Applied</p>
-          </div>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+            <span className={`status ${job.status}`}>{job.status}</span>
 
-          <div className="statCard">
-            <h3>{stats.interview}</h3>
-            <p>Interview</p>
-          </div>
+            <select
+              value={job.status}
+              onChange={(e) => updateStatus(job.id, e.target.value)}
+            >
+              <option value="applied">Applied</option>
+              <option value="interview">Interview</option>
+              <option value="rejected">Rejected</option>
+              <option value="accepted">Accepted</option>
+            </select>
 
-          <div className="statCard">
-            <h3>{stats.rejected}</h3>
-            <p>Rejected</p>
-          </div>
-
-          <div className="statCard">
-            <h3>{stats.accepted}</h3>
-            <p>Accepted</p>
+            <button
+              onClick={() => deleteJob(job.id)}
+              className="deleteBtn"
+            >
+              Delete
+            </button>
           </div>
         </div>
-
-        {/* ADD JOB FORM */}
-        <form onSubmit={addJob} className="form">
-          <input
-            type="text"
-            placeholder="Job Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="input"
-          />
-
-          <input
-            type="text"
-            placeholder="Company"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-            className="input"
-          />
-
-          <button type="submit" className="button">
-            Add Job
-          </button>
-        </form>
-
-        {/* JOB LIST */}
-        {jobs.map((job) => (
-          <div className="card">
-  <div>
-    <h3>{job.title}</h3>
-    <p>{job.company}</p>
-  </div>
-
-  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    <span className={`status ${job.status}`}>
-      {job.status}
-    </span>
-
-    <select
-      value={job.status}
-      onChange={(e) => updateStatus(job._id, e.target.value)}
-    >
-      <option value="applied">Applied</option>
-      <option value="interview">Interview</option>
-      <option value="rejected">Rejected</option>
-      <option value="accepted">Accepted</option>
-    </select>
-
-    <button
-      onClick={() => deleteJob(job._id)}
-      className="deleteBtn"
-    >
-      Delete
-    </button>
-  </div>
-</div>
-        ))}
-      </div>
-    </>
+      ))}
+    </div>
   );
 }
 

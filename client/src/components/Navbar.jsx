@@ -17,10 +17,8 @@ function Navbar({ darkMode, toggleDarkMode }) {
 
         {/* DARK MODE BUTTON */}
         <button onClick={toggleDarkMode}>
-          {darkMode ? "☀️ Light" : "🌙 Dark"}
+          {darkMode ? "Light" : "Dark"}
         </button>
-
-        <button onClick={handleLogout}>Logout</button>
       </div>
     </nav>
   );
