@@ -6,25 +6,16 @@ function Dashboard() {
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
 
-  // -------------------------
-  // LOAD FROM LOCALSTORAGE
-  // -------------------------
   useEffect(() => {
     const storedJobs = JSON.parse(localStorage.getItem("jobs")) || [];
     setJobs(storedJobs);
   }, []);
 
-  // -------------------------
-  // SAVE TO LOCALSTORAGE
-  // -------------------------
   const saveJobs = (updatedJobs) => {
     setJobs(updatedJobs);
     localStorage.setItem("jobs", JSON.stringify(updatedJobs));
   };
 
-  // -------------------------
-  // ADD JOB
-  // -------------------------
   const addJob = (e) => {
     e.preventDefault();
 
@@ -38,24 +29,17 @@ function Dashboard() {
     };
 
     const updatedJobs = [...jobs, newJob];
-
     saveJobs(updatedJobs);
 
     setTitle("");
     setCompany("");
   };
 
-  // -------------------------
-  // DELETE JOB
-  // -------------------------
   const deleteJob = (id) => {
     const updatedJobs = jobs.filter((job) => job.id !== id);
     saveJobs(updatedJobs);
   };
 
-  // -------------------------
-  // UPDATE STATUS
-  // -------------------------
   const updateStatus = (id, status) => {
     const updatedJobs = jobs.map((job) =>
       job.id === id ? { ...job, status } : job
@@ -64,9 +48,6 @@ function Dashboard() {
     saveJobs(updatedJobs);
   };
 
-  // -------------------------
-  // STATS (DERIVED)
-  // -------------------------
   const stats = jobs.reduce(
     (acc, job) => {
       acc.total++;
@@ -82,14 +63,10 @@ function Dashboard() {
     }
   );
 
-  // -------------------------
-  // UI
-  // -------------------------
   return (
     <div className="container">
       <h2>My Jobs Dashboard</h2>
 
-    
       <div className="statsContainer">
         <div className="statCard"><h3>{stats.total}</h3><p>Total</p></div>
         <div className="statCard"><h3>{stats.applied}</h3><p>Applied</p></div>
@@ -98,7 +75,6 @@ function Dashboard() {
         <div className="statCard"><h3>{stats.accepted}</h3><p>Accepted</p></div>
       </div>
 
-  
       <form onSubmit={addJob} className="form">
         <input
           type="text"
@@ -119,7 +95,6 @@ function Dashboard() {
         <button className="button">Add Job</button>
       </form>
 
-  
       {jobs.map((job) => (
         <div className="card" key={job.id}>
           <div>
@@ -140,10 +115,7 @@ function Dashboard() {
               <option value="accepted">Accepted</option>
             </select>
 
-            <button
-              onClick={() => deleteJob(job.id)}
-              className="deleteBtn"
-            >
+            <button onClick={() => deleteJob(job.id)} className="deleteBtn">
               Delete
             </button>
           </div>
