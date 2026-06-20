@@ -8,16 +8,25 @@ import jobRoutes from "./routes/jobRoutes.js";
 // load env FIRST
 dotenv.config();
 
-// connect DB
-connectDB();
-
 const app = express();
+
+// Ensure DB is connected before handling API requests (required for Vercel serverless)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection failed:", error.message);
+    res.status(500).json({ message: "Database connection failed" });
+  }
+});
 
 // middleware
 app.use(cors({
   // Allows your local dev environment AND your future deployed frontend to access the API
   origin: [
-    "https://job-tracker-npz7.vercel.app/", // Your deployed frontend URL
+    "http://localhost:5173",
+    "https://job-tracker-npz7.vercel.app",
     /\.vercel\.app$/ // Matches any Vercel deployment preview/production URL
   ],
   credentials: true
