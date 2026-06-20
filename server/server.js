@@ -17,7 +17,7 @@ const app = express();
 app.use(cors({
   // Allows your local dev environment AND your future deployed frontend to access the API
   origin: [
-    "http://localhost:5173", 
+    "https://job-tracker-npz7.vercel.app", // Your deployed frontend URL
     /\.vercel\.app$/ // Matches any Vercel deployment preview/production URL
   ],
   credentials: true
