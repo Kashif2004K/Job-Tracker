@@ -10,7 +10,7 @@ function Navbar({ darkMode, toggleDarkMode }) {
 
   return (
     <nav className="navbar">
-      <h2 className="logo">Job Tracker</h2>
+      <h2 className="logo">TrackJob</h2>
 
       <div className="navLinks">
         <Link to="/dashboard">Dashboard</Link>

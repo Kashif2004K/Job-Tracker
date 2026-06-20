@@ -89,7 +89,7 @@ function Dashboard() {
     <div className="container">
       <h2>My Jobs Dashboard</h2>
 
-      {/* STATS */}
+    
       <div className="statsContainer">
         <div className="statCard"><h3>{stats.total}</h3><p>Total</p></div>
         <div className="statCard"><h3>{stats.applied}</h3><p>Applied</p></div>
@@ -98,7 +98,7 @@ function Dashboard() {
         <div className="statCard"><h3>{stats.accepted}</h3><p>Accepted</p></div>
       </div>
 
-      {/* FORM */}
+  
       <form onSubmit={addJob} className="form">
         <input
           type="text"
@@ -119,7 +119,7 @@ function Dashboard() {
         <button className="button">Add Job</button>
       </form>
 
-      {/* LIST */}
+  
       {jobs.map((job) => (
         <div className="card" key={job.id}>
           <div>
