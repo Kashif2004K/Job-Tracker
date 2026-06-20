@@ -5,8 +5,11 @@ import Navbar from "./components/Navbar";
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
+  const savedTheme = localStorage.getItem("theme");
+
+  // default is DARK if nothing saved
+  return savedTheme ? savedTheme === "dark" : true;
+}); 
 
   // APPLY THEME EFFECT
   useEffect(() => {
